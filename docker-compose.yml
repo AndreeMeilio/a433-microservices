@@ -1,0 +1,53 @@
+# Menggunakan versi 3.7 docker compose
+version: "3.7"
+
+services:
+  # Nama service untuk container aplikasinya
+  item-app:
+    # Menggunakan image dari ghcr hasil dari build_push_image.sh
+    image: ghcr.io/andreemeilio/item-app:v1
+    # Menggunakan nama container untuk mempermudah action seperti docker container rm item-app
+    container_name: item-app
+    # service tidak akan berjalan jika service item-db belum selesai
+    depends_on:
+      - item-db
+    # port mapping dari port container 8080 ke port host 80
+    ports:
+      - 80:8080
+    # menggunakan network app-network agar item-app dan item-db memiliki network yang sama
+    networks:
+      - app-network
+    # menggunakan restart policy agar container selalu restart ketika terhenti
+    restart: always
+
+  # nama service untuk mongodbnya  
+  item-db:
+    # menggunakan image mongo:3
+    image: mongo:3
+    # Menggunakan nama container untuk mempermudah action seperti docker container rm item-db
+    container_name: item-db
+    # menggunakan volume sebagai backup 
+    volumes:
+      - app-db:/data/db
+    # port mapping dari port container 27017 ke port host 27017
+    ports:
+      - 27017:27017
+    # menggunakan network app-network agar sama dengan item-app
+    networks:
+      - app-network
+    # menggunakan restart policy agar container selalu restart ketika terhenti    
+    restart: always
+# pembuatan volume untuk item-db 
+volumes:
+  # nama volume untuk item-db
+  app-db:
+    # spesifik volumenya app-db jika tidak pakai ini nama volumenya akan a4330microservices_app-db
+    name: app-db
+# pembuatan networks untuk item-app dan item-db
+networks:
+  # nama networknya
+  app-network:
+    #driver yang digunakan 
+    driver: bridge
+    #nama network jika tidak pakai ini namanya akan a433-microservies_app-network
+    name: app-network
