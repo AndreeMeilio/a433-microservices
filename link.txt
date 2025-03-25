@@ -1,0 +1,1 @@
+https://github.com/AndreeMeilio/a433-microservices/pkgs/container/item-app
